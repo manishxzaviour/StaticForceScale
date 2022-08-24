@@ -1,31 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>StaticForceScale</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="./style.css" rel="stylesheet">
-    </head>
-    <body>
-    <div class="headder">
-        <div class="wrapper GenericFont">
-            Force Scale
-        </div>
-        <div id="reset">
-            <button type="button" id="Reset" class="GenericFont">Reset</button>
-        </div>
+  <head>
+    <title>StaticForceScale</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="./style.css" rel="stylesheet" />
+    <script src="./index.js" defer></script>
+  </head>
+  <body>
+    <div class="headder shaddow">
+      <div class="wrapper GenericFont">Force Scale</div>
+      <div id="reset">
+        <button type="button" id="Reset" class="GenericFont">Reset</button>
+      </div>
     </div>
-    <div class="workSpaceCont">
-        <p class="GenericFont" style="margin: 2px;">workSpace</p>
-        <div id="workSpace">  
-        </div>
+    <div class="workSpaceWrap">
+      <p class="GenericFont" style="margin: 2px"><i>workSpace</i></p>
+      <br />
+      <div id="workSpace" class="shaddow container">
+      </div>
     </div>
     <div class="selection">
-        <button type="button" id="mass" title="units: error:" class="GenericFont">Weight/Mass</button>
-        <button type="button" id="impulse" title="units: error:" class="GenericFont">Impulse</button>
-        <button type="button" id="plot" title="units: error:" class="GenericFont">Plotter</button>
-        <button type="button" id="download" title="format:" class="GenericFont">Download</button>
-        <button type="button" id="eval" title="jsEval"  class="GenericFont">CustomEval</button>
+      <button
+        type="button"
+        id="massB"
+        title=" error:"
+        class="GenericFont"
+      >
+        Weight/Mass
+      </button>
+      <button
+        type="button"
+        id="pulseB"
+        title=" error:"
+        class="GenericFont"
+      >
+        Impulse
+      </button>
+      <button
+        type="button"
+        id="plotB"
+        title=" error:"
+        class="GenericFont"
+      >
+        Plotter
+      </button>
+      <button type="button" id="downloadB" title="(only in plotter) format:" disabled class="GenericFont">
+        Download
+      </button>
+      <button type="button" id="evalB" title="jsEval" class="GenericFont">
+        CustomEval
+      </button>
     </div>
-    </body>
+  </body>
 </html>
