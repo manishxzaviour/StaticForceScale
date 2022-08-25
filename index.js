@@ -34,7 +34,9 @@ let context;
 let b = selection.map((a) => {
   return document.getElementById(a);
 });
-function GetD() {
+function GetD() {//get data
+  // make request every 1 s and get array
+  // append array to larger array
   DataGm = 1000;
   refD();
 }
@@ -69,19 +71,20 @@ function get() {
   srn++;
 }
 b[0].onclick = () => {
+  srn=1;
   state='Weight';
   workSpace.innerHTML = `<label for="weight"><strong>${state}`+ tempLit;
+  table = document.getElementById("itemL");
   GetD();
-  // does not get tale when clicked get gets disabled
 };
 b[1].onclick = () => {
+  srn=1;
   state='Impulse';
   workSpace.innerHTML = `<label for="weight"><strong>${state}`+ tempLit;
+  table = document.getElementById("itemL");
   GetD();
 };
 b[2].onclick = () => {
-  //advanceServer eg
-  // js draw?
   //80 hz to 1 hz save to a array
   let x=document.createElement('script');
   x.src="./plot.js";
