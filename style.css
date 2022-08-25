@@ -15,27 +15,14 @@ body {
   font-size: 30px;
   font-family: "Rubik", sans-serif;
 }
-#reset {
-  width: 100px;
-  display: inline-block;
-  position: relative;
-  left: 90%;
-}
-#reset button {
-  color: blueviolet;
-  background-color: rgb(216, 227, 191);
-  border-radius: 5px;
-  cursor: pointer;
-}
-#reset button:hover {
-  border-radius: 10px;
-  border: 4px dotted rgb(136, 216, 238);
-}
 .workSpaceWrap {
   width: 80%;
   height: auto;
   background-color: aliceblue;
   display: inline-block;
+  border-radius: 6px;
+  padding: 10px;
+  margin: 10px;
 }
 .selection {
   display: flex;
@@ -49,6 +36,7 @@ body {
 .selection button {
   margin: 5px;
   width: 200px;
+  
 }
 .selection button:hover {
   cursor: pointer;
