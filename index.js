@@ -1,4 +1,4 @@
-let state='Weight';
+let state = "Weight";
 let tempLit = `
 </strong></label><input type="number" step="any" id="Data" placeholder="000000000" style="font-size:20px ;">
                 <br>
@@ -6,12 +6,12 @@ let tempLit = `
                 <select id="sel">
                     <option selected>Gm</option>
                     <option>Kg</option>
-                    <option>N</option>
+                    <option>N (mass)</option>
                     <option>Pasc (N/m^2)</option>
                     <option>waterEq</option>
                 </select>
-                <button type="button" id="ref" onclick="GetD()">ref</button>
-                <button type="button" id="get" onclick="get()">get</button>
+                <button type="button" id="ref" style="cursor:pointer; font-size:20px; margin:5px"onclick="GetD()">ref</button>
+                <button type="button" id="get" style="cursor:pointer; font-size:20px; margin:5px" onclick="get()">get</button>
                 <table id="itemL">
                     <tr>
                     <th>Sr</th>
@@ -21,23 +21,58 @@ let tempLit = `
                     <th>Dimension</th>
                     </tr>
                 </table>`;
+let plotD = `
+                <h3>Graph T(s) vs F(N)</h3><input type="number" step="any" id="Data" placeholder="000000000" style="font-size:20px;">
+                <u>scale: 1 unit = 1 s & 1 N</u>
+                <div style="background-color:rgba(206, 227, 227,0.6);">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^N
+                <canvas id="graph" title="plot T v F" height="500px" width="750px" style="background-color:white;margin:20px;border:1px solid grey; border-radius: 8px; margin:auto; position:relative; top:0px; scroll:auto;" class="shaddow">
+                </canvas>
+                <br>
+                0,0&nbsp;&nbsp;>T
+                </div>
+              `;
 let selection = ["massB", "pulseB", "plotB", "downloadB", "evalB"];
 let workSpace = document.getElementById("workSpace");
-workSpace.innerHTML = `<label for="weight"><strong>${state}`+tempLit;
+workSpace.innerHTML = `<label for="weight"><strong>${state}` + tempLit;
 let DatD = document.getElementById("Data");
 let unit = document.getElementById("sel");
 let srn = 1;
 let DataGm;
 let table = document.getElementById("itemL");
+let samples = document.getElementById("samples");
 let canvas;
 let context;
+let count = 0;
+let DataR=[];
+let temp=[];
+let timeOut;
 let b = selection.map((a) => {
   return document.getElementById(a);
 });
-function GetD() {//get data
+function recieveD() {
+  //get data
   // make request every 1 s and get array
   // append array to larger array
-  DataGm = 1000;
+  for(let i=0;i<80;i++){
+    temp[i]=Math.random() * 100000;
+  }
+  DataR=DataR.concat(temp);
+  let x=0;
+  if(state=='Weight'){
+    temp.forEach((a)=>{
+      x+=a;
+    });
+    DataGm=x/temp.length;
+  }
+  else{
+    DataGm=Math.max.apply(null,temp);
+  }
+  samples.innerHTML = `samples : ${count} mode : ${state}`;
+  count++;
+}
+function GetD() {
+  recieveD();
   refD();
 }
 function refD() {
@@ -71,31 +106,47 @@ function get() {
   srn++;
 }
 b[0].onclick = () => {
-  srn=1;
-  state='Weight';
-  workSpace.innerHTML = `<label for="weight"><strong>${state}`+ tempLit;
+  clearInterval(timeOut);
+  srn = 1;
+  state = "Weight";
+  workSpace.innerHTML = `<label for="weight"><strong>${state}` + tempLit;
   table = document.getElementById("itemL");
   GetD();
 };
 b[1].onclick = () => {
-  srn=1;
-  state='Impulse';
-  workSpace.innerHTML = `<label for="weight"><strong>${state}`+ tempLit;
+  clearInterval(timeOut);
+  srn = 1;
+  state = "Impulse";
+  workSpace.innerHTML = `<label for="weight"><strong>${state}` + tempLit;
   table = document.getElementById("itemL");
   GetD();
 };
 b[2].onclick = () => {
   //80 hz to 1 hz save to a array
-  let x=document.createElement('script');
-  x.src="./plot.js";
+  let x = document.createElement("script");
+  x.src = "./plot.js";
+  workSpace.style.width = "760px";
+  workSpace.innerHTML = plotD;
+  canvas = document.getElementById("graph");
+  context = canvas.getContext("2d");
   document.body.appendChild(x);
+  setTimeout(()=>{
+    timeOut=setInterval(() => {
+      document.getElementById("Data").value = DatD.value = DataGm / 1000 / 9.806;;
+      recieveD();
+      draw();
+    }, 1000);
+    grid();
+  },200);
   b[3].disabled = false;
 };
 b[3].onclick = () => {
+  clearInterval(timeOut);
   //download
   alert("only in plotter!");
 };
 b[4].onclick = () => {
+  clearInterval(timeOut);
   let evalF = document.createElement("textarea");
   evalF.style = "height:500px;width:700px;font-size:17px;";
   evalF.setAttribute("id", "js");
