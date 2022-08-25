@@ -26,7 +26,7 @@ let plotD = `
                 <u>scale: 1 unit = 1 s & 1 N</u>
                 <div style="background-color:rgba(206, 227, 227,0.6);">
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^N
-                <canvas id="graph" title="plot T v F" height="500px" width="750px" style="background-color:white;margin:20px;border:1px solid grey; border-radius: 8px; margin:auto; position:relative; top:0px; scroll:auto;" class="shaddow">
+                <canvas id="graph" height="500px" width="750px" style="background-color:white;margin:20px;border:3px dotted grey; margin:auto; position:relative; top:0px; scroll:auto; cursor:pointer" class="shaddow">
                 </canvas>
                 <br>
                 0,0&nbsp;&nbsp;>T
@@ -129,12 +129,20 @@ b[2].onclick = () => {
   workSpace.innerHTML = plotD;
   canvas = document.getElementById("graph");
   context = canvas.getContext("2d");
+  canvas.onmouseover=(e)=>{
+    var rect = e.target.getBoundingClientRect();
+    canvas.onmousedown=()=>{
+    var x = e.clientX - rect.left; 
+    var y = canvas.height-(e.clientY - rect.top);
+    canvas.setAttribute('title',`T : ${x}, N : ${y}`);
+    }
+  }
   document.body.appendChild(x);
   setTimeout(()=>{
     timeOut=setInterval(() => {
       document.getElementById("Data").value = DatD.value = DataGm / 1000 / 9.806;;
       recieveD();
-      draw();
+      // draw();
     }, 1000);
     grid();
   },200);
@@ -153,7 +161,7 @@ b[4].onclick = () => {
   workSpace.append(evalF);
   let p = `
     <button type="button" id="eval" class="GenericFont">eval</button>
-    <h4>Available variables :
+    <div id="discription"><h4>Available variables :
     </h4>
     <ul>
     <li><strong>'DataGm'</strong>  availabe in Gm</li>
@@ -162,7 +170,10 @@ b[4].onclick = () => {
     <li><strong>'workSpace'</strong>  workSpace</li>
     <li><strong>'GetD()'</strong>  available every second</li>
     <li><strong>'get()'</strong>   store to item list in weight mode</li>
+    <li><strong>'draw(x,y)'</strong>   store and draw from pointSet</li>
+    <li><strong>'drawLine(p1, p2, stroke = "rgba(0, 0, 0, 0.3)", width = 1)'</strong>   draw line</li>
     </ul>
+    </div>
     `;
   let x = document.createElement("div");
   x.innerHTML = p;
