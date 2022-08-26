@@ -13,34 +13,35 @@ function drawLine(p1, p2, stroke = "rgba(0, 0, 0, 0.1)", width = 0.5) {
   } catch (error) {}
   context.stroke();
 }
+let colourScale = "rgb(255,0,0)";
 let pointSet = [[0, 0]];
-let factor = 10;
-function scale(x, y) {
-let colourScale = "rgb(0,255,0)";
-  let threshold = [730, 70];
-  // 500px = 2 kg = ~20 N 10 kg = 100 N
-  if (y > threshold[0]) {
-    while (y> threshold[0]) {
-      y= y / 2;
-      factor++;
-    }
-    colourScale = `rgb(${12 * factor},0,0)`;
-  }
-  else if(threshold[1]>y){
-    while (threshold[1]>y) {
-        y = y * 2;
-        factor--;
-      }
-      colourScale = `rgb(0,0,${12 * factor})`;
-  }
-  return [[x, y], colourScale];
-}
+let scaleFactor = 2;
+let diff = 0;
+canvas.onmousedown = (e) => {
+  var rect = e.target.getBoundingClientRect();
+  var x = e.clientX-rect.left;
+  var y = e.clientY-rect.top;
+  console.log('x:'+x);
+  console.log('y:'+y);
+  context.beginPath();
+  context.strokeStyle = "blue";
+  context.lineWidth = 1;
+  context.arc(x, y, 4, 0, 2 * Math.PI);
+  context.font = "17px Arial";
+  context.stroke();
+  context.beginPath();
+  context.lineWidth = 0.6;
+  context.strokeStyle = "grey";
+  context.fillText(`T : ${x/80}S F : ${(canvas.height-y)*scaleFactor}N`,x,y);
+  context.stroke();
+};
 function draw(t = 0, n = 0) {
   let x = canvas.width;
   let y = canvas.height;
-  pointSet.push(scale(t, n));
+  pointSet.push([t, n / scaleFactor]);
   if (x - t < 150) {
     canvas.setAttribute("width", `${x + (x - t) + 750}px`);
+    diff = x - t;
     canvas.setAttribute("height", `750px`);
     grid();
     document.querySelector(".selection").style.transition = "0.4s";
@@ -52,17 +53,25 @@ function draw(t = 0, n = 0) {
     document.querySelector(".selection").style.transition = "0.1s";
     document.querySelector(".selection").style.top = `-50px`;
     document.querySelector(".selection").style.left = `${canvas.width - 200}px`;
-    window.scrollBy(750, y / 4);
+    window.scrollBy(750, 0);
   }
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  grid();
   pointSet.forEach((e) => {
-    drawLine(e[0], pointSet[pointSet.indexOf(e) + 1][0], e[1], 0.1);
+    drawLine(e, pointSet[pointSet.indexOf(e) + 1], colourScale, 1);
   });
 }
-function grid(c = "rgba(0, 0, 0, 0.3)") {
+function grid(c = "rgba(0, 0, 0, 0.3)") { 
   for (let i = 0; i < canvas.width; i += 25) {
     drawLine([i, 0], [i, canvas.height]);
+    context.beginPath();
+    context.font = "10px Arial";
+    if(i%80==0)
+    context.fillText(`${(i/80)/5} s`,i, canvas.height);
+    context.stroke();
   }
   for (let j = 0; j < canvas.height; j += 25) {
     drawLine([0, j], [canvas.width, j], c);
   }
+  drawLine([0,10],[canvas.width,10],'rgb(3, 126, 160)',2);
 }

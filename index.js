@@ -46,6 +46,7 @@ let count = 1;
 let DataR = [];
 let temp = [];
 let timeOut;
+let period=5;
 var anchor = document.createElement("a");
 let b = selection.map((a) => {
   return document.getElementById(a);
@@ -67,7 +68,7 @@ function recieveD() {
   } else {
     DataGm = Math.max.apply(null, temp);
   }
-  samples.innerHTML = `samples : ${count} mode : ${state}`;
+  samples.innerHTML = `samples : ${count} mode: ${state}`;
   count++;
 }
 function GetD() {
@@ -85,10 +86,10 @@ function refD() {
       DatD.value = DataGm / 1000;
       break;
     case "N (mass)":
-      DatD.value = (DataGm*9.806)/ 1000 ;
+      DatD.value = (DataGm*9.806/ 1000) ;
       break;
     case "Pasc (N/m^2)":
-      DatD.value = DataGm / 1000 / 9.806 / eval(prompt("area in m"));
+      DatD.value = (DataGm*9.806 / 1000) / eval(prompt("area in m"));
       break;
   }
   unit.onchange = refD;
@@ -130,23 +131,14 @@ b[2].onclick = () => {
   workSpace.innerHTML = plotD;
   canvas = document.getElementById("graph");
   context = canvas.getContext("2d");
-  canvas.onmouseover = (e) => {
-    var rect = e.target.getBoundingClientRect();
-    canvas.onmousedown = () => {
-      var x = e.clientX - rect.left;
-      var y = canvas.height - (e.clientY - rect.top);
-      canvas.setAttribute("title", `T : ${x*5/80} s, N : ${y}`);
-    };
-  };
   document.body.appendChild(x);
   setTimeout(() => {
     timeOut = setInterval(() => {
-      document.getElementById("Data").value=
-        DataGm / 1000 / 9.806;
+      document.getElementById("Data").value=DataGm*9.806 / 1000;
       recieveD();
       temp.forEach((a) => {
         setTimeout(() => {
-          draw(temp.indexOf(a)*5  + (count - 3) * temp.length*5, a);
+          draw(temp.indexOf(a)*period  + (count - 3) * temp.length*period, a*9.806/ 1000);
         }, 50);
       });
     }, 1000);
@@ -157,6 +149,8 @@ b[2].onclick = () => {
 b[3].onclick = () => {
   clearInterval(timeOut);
   grid("green");
+  context.fillStyle = "rgba(255,255,255,0.1)";
+  context.fillRect (0, 0, canvas.width, canvas.height); 
   anchor.href = canvas.toDataURL("image/png");
   anchor.download = "plot.PNG";
   anchor.click();
@@ -169,22 +163,7 @@ b[4].onclick = () => {
   evalF.setAttribute("id", "js");
   workSpace.append(evalF);
   let p = `
-    <button type="button" id="eval" class="GenericFont">eval</button>
-    <div id="discription"><h4>Available variables :
-    </h4>
-    <ul>
-    <li><strong>'DataGm'</strong>  availabe in Gm</li>
-    <li><strong>'DatD'</strong>  availabe in Gm</li>
-    <li><strong>'unit'</strong>  availabe in Gm</li>
-    <li><strong>'DataR'</strong>  all availavle data in Gm</li>
-    <li><strong>'workSpace'</strong>  workSpace</li>
-    <li><strong>'GetD()'</strong>  available every second</li>
-    <li><strong>'get()'</strong>   store to item list in weight mode</li>
-    <li><strong>'draw(x,y)'</strong>   store and draw from pointSet</li>
-    <li><strong>'drawLine(p1, p2, stroke = "rgba(0, 0, 0, 0.3)", width = 1)'</strong>   draw line</li>
-    <li><strong>'downloadRaw()", width = 1)'</strong>   download DataR as text</li>
-    </ul>
-    </div>
+    go to about page to find available variables <a href="/about.html" target="_blank" el="noopener">about</a>
     `;
   let x = document.createElement("div");
   x.innerHTML = p;
