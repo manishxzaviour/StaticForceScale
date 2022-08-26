@@ -8,7 +8,6 @@ let tempLit = `
                     <option>Kg</option>
                     <option>N (mass)</option>
                     <option>Pasc (N/m^2)</option>
-                    <option>waterEq</option>
                 </select>
                 <button type="button" id="ref" style="cursor:pointer; font-size:20px; margin:5px"onclick="GetD()">ref</button>
                 <button type="button" id="get" style="cursor:pointer; font-size:20px; margin:5px" onclick="get()">get</button>
@@ -43,10 +42,11 @@ let table = document.getElementById("itemL");
 let samples = document.getElementById("samples");
 let canvas;
 let context;
-let count = 0;
-let DataR=[];
-let temp=[];
+let count = 1;
+let DataR = [];
+let temp = [];
 let timeOut;
+var anchor = document.createElement("a");
 let b = selection.map((a) => {
   return document.getElementById(a);
 });
@@ -54,19 +54,18 @@ function recieveD() {
   //get data
   // make request every 1 s and get array
   // append array to larger array
-  for(let i=0;i<80;i++){
-    temp[i]=Math.random() * 100000;
+  for (let i = 0; i < 80; i++) {
+    temp[i] = Math.random() * 100000;
   }
-  DataR=DataR.concat(temp);
-  let x=0;
-  if(state=='Weight'){
-    temp.forEach((a)=>{
-      x+=a;
+  DataR = DataR.concat(temp);
+  let x = 0;
+  if (state == "Weight") {
+    temp.forEach((a) => {
+      x += a;
     });
-    DataGm=x/temp.length;
-  }
-  else{
-    DataGm=Math.max.apply(null,temp);
+    DataGm = x / temp.length;
+  } else {
+    DataGm = Math.max.apply(null, temp);
   }
   samples.innerHTML = `samples : ${count} mode : ${state}`;
   count++;
@@ -85,14 +84,11 @@ function refD() {
     case "Kg":
       DatD.value = DataGm / 1000;
       break;
-    case "N":
-      DatD.value = DataGm / 1000 / 9.806;
+    case "N (mass)":
+      DatD.value = (DataGm*9.806)/ 1000 ;
       break;
     case "Pasc (N/m^2)":
       DatD.value = DataGm / 1000 / 9.806 / eval(prompt("area in m"));
-      break;
-    case "waterEq":
-      DatD.value = DataGm / 1000 / 9.806;
       break;
   }
   unit.onchange = refD;
@@ -104,6 +100,11 @@ function get() {
   tr.innerHTML = temp;
   table.appendChild(tr);
   srn++;
+}
+function downloadRaw(){
+  anchor.setAttribute("download", "Raw.txt");
+  anchor.href = "data:text/plain," + encodeURIComponent(DataR.join("\n"));
+  anchor.click();
 }
 b[0].onclick = () => {
   clearInterval(timeOut);
@@ -129,29 +130,37 @@ b[2].onclick = () => {
   workSpace.innerHTML = plotD;
   canvas = document.getElementById("graph");
   context = canvas.getContext("2d");
-  canvas.onmouseover=(e)=>{
+  canvas.onmouseover = (e) => {
     var rect = e.target.getBoundingClientRect();
-    canvas.onmousedown=()=>{
-    var x = e.clientX - rect.left; 
-    var y = canvas.height-(e.clientY - rect.top);
-    canvas.setAttribute('title',`T : ${x}, N : ${y}`);
-    }
-  }
+    canvas.onmousedown = () => {
+      var x = e.clientX - rect.left;
+      var y = canvas.height - (e.clientY - rect.top);
+      canvas.setAttribute("title", `T : ${x*5/80} s, N : ${y}`);
+    };
+  };
   document.body.appendChild(x);
-  setTimeout(()=>{
-    timeOut=setInterval(() => {
-      document.getElementById("Data").value = DatD.value = DataGm / 1000 / 9.806;;
+  setTimeout(() => {
+    timeOut = setInterval(() => {
+      document.getElementById("Data").value=
+        DataGm / 1000 / 9.806;
       recieveD();
-      // draw();
+      temp.forEach((a) => {
+        setTimeout(() => {
+          draw(temp.indexOf(a)*5  + (count - 3) * temp.length*5, a);
+        }, 50);
+      });
     }, 1000);
     grid();
-  },200);
+  }, 200);
   b[3].disabled = false;
 };
 b[3].onclick = () => {
   clearInterval(timeOut);
-  //download
-  alert("only in plotter!");
+  grid("green");
+  anchor.href = canvas.toDataURL("image/png");
+  anchor.download = "plot.PNG";
+  anchor.click();
+  downloadRaw();
 };
 b[4].onclick = () => {
   clearInterval(timeOut);
@@ -167,11 +176,13 @@ b[4].onclick = () => {
     <li><strong>'DataGm'</strong>  availabe in Gm</li>
     <li><strong>'DatD'</strong>  availabe in Gm</li>
     <li><strong>'unit'</strong>  availabe in Gm</li>
+    <li><strong>'DataR'</strong>  all availavle data in Gm</li>
     <li><strong>'workSpace'</strong>  workSpace</li>
     <li><strong>'GetD()'</strong>  available every second</li>
     <li><strong>'get()'</strong>   store to item list in weight mode</li>
     <li><strong>'draw(x,y)'</strong>   store and draw from pointSet</li>
     <li><strong>'drawLine(p1, p2, stroke = "rgba(0, 0, 0, 0.3)", width = 1)'</strong>   draw line</li>
+    <li><strong>'downloadRaw()", width = 1)'</strong>   download DataR as text</li>
     </ul>
     </div>
     `;

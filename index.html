@@ -12,37 +12,31 @@
       <div class="wrapper GenericFont">Force Scale</div>
     </div>
     <div class="workSpaceWrap">
-      <p class="GenericFont" style="margin: 2px; display: inline;"><i>workSpace</i></p>
-      <p id="samples" style="display: inline;"></p>
+      <p class="GenericFont" style="margin: 2px; display: inline">
+        <i>workSpace</i>
+      </p>
+      <p id="samples" style="display: inline"></p>
       <br />
-      <div id="workSpace" class="shaddow container">
-      </div>
+      <div id="workSpace" class="shaddow container"></div>
     </div>
     <div class="selection">
-      <button
-        type="button"
-        id="massB"
-        title=" error:"
-        class="GenericFont"
-      >
+      <a id="reset" title=" reload page" style="font-size: 5px;" href="/">
+        Reset
+      </a>
+      <button type="button" id="massB" title=" error:" class="GenericFont">
         Weight/Mass
       </button>
-      <button
-        type="button"
-        id="pulseB"
-        title=" error:"
-        class="GenericFont"
-      >
+      <button type="button" id="pulseB" title=" error:" class="GenericFont">
         Impulse
       </button>
+      <button type="button" id="plotB" class="GenericFont">Plotter</button>
       <button
         type="button"
-        id="plotB"
+        id="downloadB"
+        title="(only in plotter) format:"
+        disabled
         class="GenericFont"
       >
-        Plotter
-      </button>
-      <button type="button" id="downloadB" title="(only in plotter) format:" disabled class="GenericFont">
         Download
       </button>
       <button type="button" id="evalB" title="jsEval" class="GenericFont">
