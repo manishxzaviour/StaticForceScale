@@ -138,12 +138,13 @@ b[2].onclick = () => {
   context2 = canvas2.getContext("2d");
   document.body.appendChild(x);
   setTimeout(() => {
+    grid2();
     timeOut = setInterval(() => {
       document.getElementById("Data").value=DataGm*9.806 / 1000;
       recieveD();
       temp.forEach((a) => {
           pointSet.push([temp.indexOf(a)*period  + (count - 3) * temp.length*period, (a*9.806/ 1000) / scaleFactor]);
-          // draw2(temp.indexOf(a)*period  + (count - 3) * temp.length*period, a*9.806/ 1000);
+          draw2(temp.indexOf(a)*period  + (count - 3) * temp.length*period,(a*9.806/ 1000) / scaleFactor);
       });
     }, 1000);
   }, 200);

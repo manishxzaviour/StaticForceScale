@@ -16,6 +16,10 @@ function drawLine(p1, p2, stroke = "rgba(0, 0, 0, 0.1)", width = 0.5,canvas,cont
 let colourScale = "rgb(255,0,0)";
 let pointSet = [[0, 0]];
 let scaleFactor = 2;
+let pointSet2=[];
+for(let x=0;x<6*80;x++){
+  pointSet2[x]=[0,0];
+}
 canvas.onmousedown = (e) => {
   var rect = e.target.getBoundingClientRect();
   var x = e.clientX-rect.left;
@@ -79,12 +83,10 @@ function grid2(x,y){
 }
 function scale(){
 }
-function draw2(){
-  let t=[];
-  let n=[];
-  for(let x=DataR.length ; DataR.length - x < 6*80 ;x--){
-    console.log(DataR[x]);
-  }
-  grid2(t,0);
+function draw2(t,n){
+  pointSet2.shift();
+  pointSet2.push([t,n]);
+  pointSet2.forEach((e)=>{
+     drawLine([pointSet2.indexOf(e),e[1]],[pointSet2.indexOf(e)+1,pointSet2[pointSet2.indexOf(e)+1][1]],'red',1,canvas2,context2);
+  });
 }
-draw2();
