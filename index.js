@@ -25,13 +25,14 @@ let plotD = `
                 <u>scale: 1 unit = 1 s & 1 N</u>
                 <div style="background-color:rgba(206, 227, 227,0.6);">
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^N
-                <canvas id="graph" height="500px" width="750px" style="background-color:white;margin:20px;border:3px dotted grey; margin:auto; position:relative; top:0px; scroll:auto; cursor:pointer" class="shaddow">
+                <canvas id="graph" height="500px" width="750px" style="display:none;background-color:white;border:3px dotted grey; margin:auto; position:relative; top:0px; cursor:pointer" class="shaddow">
                 </canvas>
+                <canvas id="autoScaleGraph" height="500px" width="900px" style="background-color:white; margin:auto; position:relative; top:0px;cursor:pointer; border-radius:10px" class="shaddow"></canvas>
                 <br>
                 0,0&nbsp;&nbsp;>T
                 </div>
               `;
-let selection = ["massB", "pulseB", "plotB", "downloadB", "evalB"];
+let selection = ["massB", "pulseB", "plotB", "downloadB", "evalB","calB"];
 let workSpace = document.getElementById("workSpace");
 workSpace.innerHTML = `<label for="weight"><strong>${state}` + tempLit;
 let DatD = document.getElementById("Data");
@@ -42,6 +43,8 @@ let table = document.getElementById("itemL");
 let samples = document.getElementById("samples");
 let canvas;
 let context;
+let canvas2;
+let context2;
 let count = 1;
 let DataR = [];
 let temp = [];
@@ -131,30 +134,34 @@ b[2].onclick = () => {
   workSpace.innerHTML = plotD;
   canvas = document.getElementById("graph");
   context = canvas.getContext("2d");
+  canvas2 = document.getElementById("autoScaleGraph");
+  context2 = canvas2.getContext("2d");
   document.body.appendChild(x);
   setTimeout(() => {
     timeOut = setInterval(() => {
       document.getElementById("Data").value=DataGm*9.806 / 1000;
       recieveD();
       temp.forEach((a) => {
-        setTimeout(() => {
-          draw(temp.indexOf(a)*period  + (count - 3) * temp.length*period, a*9.806/ 1000);
-        }, 50);
+          pointSet.push([temp.indexOf(a)*period  + (count - 3) * temp.length*period, (a*9.806/ 1000) / scaleFactor]);
+          // draw2(temp.indexOf(a)*period  + (count - 3) * temp.length*period, a*9.806/ 1000);
       });
     }, 1000);
-    grid();
   }, 200);
   b[3].disabled = false;
 };
 b[3].onclick = () => {
   clearInterval(timeOut);
-  grid("green");
-  context.fillStyle = "rgba(255,255,255,0.1)";
-  context.fillRect (0, 0, canvas.width, canvas.height); 
-  anchor.href = canvas.toDataURL("image/png");
-  anchor.download = "plot.PNG";
-  anchor.click();
-  downloadRaw();
+  canvas.style.display="block";
+  canvas2.style.display="none";
+  if(confirm("would you like to anotate points ? \n\t dont forget to perform proper scaling before download \n\t you can always redraw all using 'draw()' without parameters with proper scaleFactor")){
+    draw();
+    grid("green")
+    anchor.href = canvas.toDataURL("image/png");
+    anchor.download = "plot.PNG";
+    anchor.click();
+    downloadRaw();
+  }
+  draw();
 };
 b[4].onclick = () => {
   clearInterval(timeOut);
@@ -173,3 +180,8 @@ b[4].onclick = () => {
     eval(document.getElementById("js").value);
   };
 };
+b[5].onclick=()=>{
+  let calWeight=parseInt(eval(prompt("calibration Weight in Gm multiple of 10")));
+  //send for calibration
+}
+  
