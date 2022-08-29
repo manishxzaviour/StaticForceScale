@@ -29,7 +29,7 @@ let plotD = `
                 </canvas>
                 <canvas id="autoScaleGraph" height="525px" width="925px" style="background-color:white; margin:auto; position:relative; top:0px;cursor:pointer; border-radius:10px" class="shaddow"></canvas>
                 <br>
-                0,0&nbsp;&nbsp;>T
+                0,0&nbsp;&nbsp;>T (ms)
                 </div>
               `;
 let selection = ["massB", "pulseB", "plotB", "downloadB", "evalB","calB"];
@@ -59,7 +59,7 @@ function recieveD() {
   // make request every 1 s and get array
   // append array to larger array
   for (let i = 0; i < 80; i++) {
-    temp[i] = Math.random() * 100000;
+    temp[i] = Math.random() * 10000;
   }
   DataR = DataR.concat(temp);
   let x = 0;
@@ -127,7 +127,6 @@ b[1].onclick = () => {
   GetD();
 };
 b[2].onclick = () => {
-  //80 hz to 1 hz save to a array
   let x = document.createElement("script");
   x.src = "./plot.js";
   workSpace.style.width = "760px";
@@ -164,6 +163,18 @@ b[3].onclick = () => {
   }
   draw();
   grid("green");
+  document.querySelector(".selection").style.opacity="0.2";
+  setTimeout(()=>{
+    let newScale=eval(prompt(`change scale? current for y-axis 1 gm = ${scaleFactor}`));
+  if(newScale!=null){
+    for(let x=0;x<pointSet.length;x++){
+      pointSet[x][1]=pointSet[x][1]*scaleFactor/newScale;
+    }
+    scaleFactor=newScale; 
+  }
+  draw();
+  grid("green");
+  },2500);
 };
 b[4].onclick = () => {
   clearInterval(timeOut);

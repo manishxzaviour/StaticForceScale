@@ -48,7 +48,7 @@ function draw(t = canvas.width, n = canvas.height) {
   canvas.setAttribute("height", `750px`);
   grid();
   pointSet.forEach((e) => {
-    if (e[1] > canvas.height) canvas.setAttribute("height", `${e[1] * 1.1}px`);
+     if (e[1] > canvas.height) canvas.setAttribute("height", `${e[1] * 1.1}px`);
     drawLine(
       e,
       pointSet[pointSet.indexOf(e) + 1],
@@ -122,7 +122,6 @@ function draw2(setGot) {
       set.push((e*9.806/ 1000));
     });
   let yMax = set[0];
-  let yMin = set[0];
   yMax=Math.max.apply(null,set);
   yMax=yMax*1.2;
   yMax=Math.floor(yMax);
