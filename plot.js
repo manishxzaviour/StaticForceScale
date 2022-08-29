@@ -22,6 +22,9 @@ function drawLine(
 }
 let colourScale = "rgb(255,0,0)";
 let pointSet = [[0, 0]];
+let set=[];
+for(let x=0;x<160;x++){set[[x]]=0;}
+let flag=true;
 let scaleFactor = 2;
 let countx=0;
 canvas.onmousedown = (e) => {
@@ -73,13 +76,13 @@ function grid2(x, y) {
   drawLine([0, 25], [canvas2.width, 25], "grey", 1, canvas2, context2);
   drawLine([25, 0], [25, canvas2.height], "grey", 1, canvas2, context2);
   let count = 0;
-  for (let i = 25; i < canvas2.width; i += 100) {
+  for (let i = 25; i < canvas2.width; i += 50) {
     drawLine([i, 20], [i, 25], "grey", 1, canvas2, context2);
     context2.beginPath();
     context2.fillStyle = "silver";
     context2.font = "13px Arial";
     try {
-      context2.fillText(`${x[count]} ms`, i, canvas2.height - 10);
+      context2.fillText(`.${x[count]}`, i, canvas2.height - 10);
       count++;
     } catch {}
     context2.stroke();
@@ -113,10 +116,11 @@ function grid2(x, y) {
     );
   }
 }
-function draw2(set) {
-  set=set.map((e)=>{
-    return (e*9.806/ 1000)
-  });
+function draw2(setGot) {
+    setGot.forEach((e)=>{
+      set.shift();
+      set.push((e*9.806/ 1000));
+    });
   let yMax = set[0];
   let yMin = set[0];
   yMax=Math.max.apply(null,set);
@@ -128,7 +132,7 @@ function draw2(set) {
   context2.clearRect(0,0,canvas2.width,canvas2.height);
   for (let x = 0; x < set.length; x++) {
     let t ;
-      t = x * canvas2.width/80;
+      t = x * canvas2.width/160;
     let n = (set[x] / yMax) * canvas2.height;
     drawLine([p[0]+25,p[1]+25],[t+25,n+25],'red',0.5,canvas2,context2);
     p=[t,n];
@@ -136,7 +140,7 @@ function draw2(set) {
   for (let y = 0; y < 10; y++) {
     temparry.push((y * yMax) / 10);
   }
-  for (let x = 0; x <10; x++) {
+  for (let x = 0; x <20; x++) {
     temparrx.push(countx);
     countx+=100;
   } 
