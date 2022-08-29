@@ -27,7 +27,7 @@ let plotD = `
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^N
                 <canvas id="graph" height="500px" width="750px" style="display:none;background-color:white;border:3px dotted grey; margin:auto; position:relative; top:0px; cursor:pointer" class="shaddow">
                 </canvas>
-                <canvas id="autoScaleGraph" height="500px" width="900px" style="background-color:white; margin:auto; position:relative; top:0px;cursor:pointer; border-radius:10px" class="shaddow"></canvas>
+                <canvas id="autoScaleGraph" height="525px" width="925px" style="background-color:white; margin:auto; position:relative; top:0px;cursor:pointer; border-radius:10px" class="shaddow"></canvas>
                 <br>
                 0,0&nbsp;&nbsp;>T
                 </div>
@@ -71,7 +71,7 @@ function recieveD() {
   } else {
     DataGm = Math.max.apply(null, temp);
   }
-  samples.innerHTML = `samples : ${count} mode: ${state}`;
+  samples.innerHTML = `sampleSet : ${count} mode: ${state}`;
   count++;
 }
 function GetD() {
@@ -142,9 +142,9 @@ b[2].onclick = () => {
     timeOut = setInterval(() => {
       document.getElementById("Data").value=DataGm*9.806 / 1000;
       recieveD();
+      draw2(temp);
       temp.forEach((a) => {
           pointSet.push([temp.indexOf(a)*period  + (count - 3) * temp.length*period, (a*9.806/ 1000) / scaleFactor]);
-          draw2(temp.indexOf(a)*period  + (count - 3) * temp.length*period,(a*9.806/ 1000) / scaleFactor);
       });
     }, 1000);
   }, 200);
@@ -154,15 +154,16 @@ b[3].onclick = () => {
   clearInterval(timeOut);
   canvas.style.display="block";
   canvas2.style.display="none";
-  if(confirm("would you like to anotate points ? \n\t dont forget to perform proper scaling before download \n\t you can always redraw all using 'draw()' without parameters with proper scaleFactor")){
+  if(confirm("download?\n would you like to anotate points ? \n\t dont forget to perform proper scaling before download \n\t you can always redraw all using 'draw()' without parameters with proper scaleFactor")){
     draw();
-    grid("green")
+    grid("green");
     anchor.href = canvas.toDataURL("image/png");
     anchor.download = "plot.PNG";
     anchor.click();
     downloadRaw();
   }
   draw();
+  grid("green");
 };
 b[4].onclick = () => {
   clearInterval(timeOut);
@@ -171,6 +172,9 @@ b[4].onclick = () => {
   evalF.setAttribute("id", "js");
   workSpace.append(evalF);
   let p = `
+  <br><br>
+  <button type="button" id="eval" class="GenericFont" style="cursor: pointer;">Eval</button>
+  <br>
     go to about page to find available variables <a href="/about.html" target="_blank" el="noopener">about</a>
     `;
   let x = document.createElement("div");
