@@ -136,7 +136,7 @@ function draw2(set) {
   for (let y = 0; y < 10; y++) {
     temparry.push((y * yMax) / 10);
   }
-  for (let x = 0; x <9; x++) {
+  for (let x = 0; x <10; x++) {
     temparrx.push(countx);
     countx+=100;
   } 
