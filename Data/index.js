@@ -146,7 +146,7 @@ b[2].onclick = () => {
           pointSet.push([temp.indexOf(a)*period  + (count - 3) * temp.length*period, (a*9.806/ 1000) / scaleFactor]);
       });
     }, 1000);
-  }, 200);
+  }, 1000);
   b[3].disabled = false;
 };
 b[3].onclick = () => {
