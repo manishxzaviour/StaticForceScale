@@ -5,7 +5,7 @@
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
-IPAddress staticIP(192, 168, 0, 156); // static ip creating problems
+IPAddress staticIP(192, 168, 0, 156);
 IPAddress subnet(255, 255, 0, 0);
 IPAddress gateway(192, 168, 0, 3);
 IPAddress primaryDNS(8, 8, 8, 8);
@@ -18,7 +18,7 @@ const int btn = 0;
 const int led = LED_BUILTIN;
 int calib1 = 1;
 int calib2 = 1;
-int data[20] = {};
+long data[20] = {};
 HX711 scale;
 int count = 0;
 ESP8266WebServer server(80);
@@ -57,7 +57,7 @@ void wifiAp()
 }
 void ota()
 {
-  ArduinoOTA.setHostname("wambo");
+  ArduinoOTA.setHostname("Scale");
   ArduinoOTA.onStart([]()
                      {
     String type;
@@ -143,7 +143,12 @@ void PlotJs()
 {
   rFile("/plot.js" , 2);
 }
-void handleGet() {}
+void handleGet() {
+  String temp;
+  for(int i=0;i<20;i++)
+  temp+=String(data[i])+",";
+  server.send(200,"text/plain",temp);
+}
 void handleRequest()
 {
   server.begin();
@@ -152,6 +157,7 @@ void handleRequest()
   server.on("/css", style);
   server.on("/index.js", IndexJs);
   server.on("/plot.js", PlotJs);
+  server.on("/get", handleGet);
   server.onNotFound(hNF);
 }
 void setup()
@@ -174,8 +180,8 @@ void setup()
   file.close();
   ssid = s.substring(s.indexOf("ssid//") + 6, s.indexOf("//pwd"));
   password = s.substring(s.indexOf("//pwd//") + 7, s.indexOf("//calib1"));
-  // calib1 = s.substring(s.indexOf("//calib1") + 8, s.indexOf("//calib2")).toInt();
-  // calib2 = s.substring(s.indexOf("//calib2") + 8, s.indexOf("//end")).toInt();
+  calib1 = s.substring(s.indexOf("//calib1//") + 10, s.indexOf("//calib2")).toInt();
+  calib2 = s.substring(s.indexOf("//calib2//") + 10, s.indexOf("//end")).toInt();
   wifiAp();
   ota();
   MDNS.begin("Scale");
@@ -209,4 +215,5 @@ void loop()
   server.handleClient();
   MDNS.update();
   ArduinoOTA.handle();
+  String temp="";
 }

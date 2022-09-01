@@ -37,7 +37,7 @@ canvas.onmousedown = (e) => {
   context.arc(x, y, 4, 0, 2 * Math.PI);
   context.font = "17px Arial";
   context.fillText(
-    `T : ${x / 80}S F : ${(canvas.height - y) * scaleFactor}N`,
+    `T : ${x / 20}S F : ${(canvas.height - y) / scaleFactor}N`,
     x,
     y
   );
@@ -46,9 +46,10 @@ canvas.onmousedown = (e) => {
 function draw(t = canvas.width, n = canvas.height) {
   canvas.setAttribute("width", `${pointSet[pointSet.length - 1][0] + 300}px`);
   canvas.setAttribute("height", `750px`);
+  context.clearRect(0,0,canvas.width,canvas.height)
   grid();
-  pointSet.forEach((e) => {
-     if (e[1] > canvas.height) canvas.setAttribute("height", `${e[1] * 1.1}px`);
+  DataR.forEach((e) => { // do using data r
+     if (e[1]*scaleFactor > canvas.height) canvas.setAttribute("height", `${e[1]*scaleFactor * 1.1}px`);
     drawLine(
       e,
       pointSet[pointSet.indexOf(e) + 1],
@@ -64,7 +65,7 @@ function grid(c = "rgba(0, 0, 0, 0.3)") {
     drawLine([i, 0], [i, canvas.height], c, 0.3, canvas, context);
     context.beginPath();
     context.font = "10px Arial";
-    if (i % 80 == 0) context.fillText(`${i / 80 / 5} s`, i, canvas.height);
+    if (i % (20*period) == 0) context.fillText(`${i / (20*period) /5} s`, i, canvas.height);
     context.stroke();
   }
   for (let j = 0; j < canvas.height; j += 25) {
@@ -124,15 +125,15 @@ function draw2(setGot) {
   let yMax = set[0];
   yMax=Math.max.apply(null,set);
   yMax=yMax*1.2;
-  yMax=Math.floor(yMax);
+  yMax=Math.ceil(yMax);
   let temparry = [];
   let temparrx=[];
   let p=[0,0];
   context2.clearRect(0,0,canvas2.width,canvas2.height);
   for (let x = 0; x < set.length; x++) {
     let t ;
-      t = x * canvas2.width/160;
-    let n = (set[x] / yMax) * canvas2.height;
+    t = x * canvas2.width/160;
+    let n = (set[x] / yMax) * (canvas2.height-25);
     drawLine([p[0]+25,p[1]+25],[t+25,n+25],'red',0.5,canvas2,context2);
     p=[t,n];
   }
@@ -141,7 +142,7 @@ function draw2(setGot) {
   }
   for (let x = 0; x <20; x++) {
     temparrx.push(countx);
-    countx+=100;
+    countx+=50;
   } 
   grid2(temparrx, temparry);
 }

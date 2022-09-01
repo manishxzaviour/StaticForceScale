@@ -32,7 +32,7 @@ let plotD = `
                 0,0&nbsp;&nbsp;>T (ms)
                 </div>
               `;
-let selection = ["massB", "pulseB", "plotB", "downloadB", "evalB","calB"];
+let selection = ["massB", "pulseB", "plotB", "downloadB", "evalB", "calB"];
 let workSpace = document.getElementById("workSpace");
 workSpace.innerHTML = `<label for="weight"><strong>${state}` + tempLit;
 let DatD = document.getElementById("Data");
@@ -49,18 +49,30 @@ let count = 1;
 let DataR = [];
 let temp = [];
 let timeOut;
-let period=5;
+let period = 50;
 var anchor = document.createElement("a");
 let b = selection.map((a) => {
   return document.getElementById(a);
 });
 function recieveD() {
-  //get data
-  // make request every 1 s and get array
-  // append array to larger array
-  for (let i = 0; i < 80; i++) {
-    temp[i] = Math.random() * 10000;
-  }
+  // for (let i = 0; i < 80; i++) {
+  //   temp[i] = Math.random() * 10000;
+  // }
+  let xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      let str = this.responseText;
+      for (let i = 0; i < 20; i++) {
+        temp[i] = parseInt(str.substring(0, str.indexOf(",")));
+        str = str.substring(str.indexOf(",") + 1, str.length);
+      }
+      console.log(temp);
+    } else {
+      console.log(this.status);
+    }
+  };
+  xhttp.open("GET", "/get", true);
+  xhttp.send();
   DataR = DataR.concat(temp);
   let x = 0;
   if (state == "Weight") {
@@ -89,10 +101,10 @@ function refD() {
       DatD.value = DataGm / 1000;
       break;
     case "N (mass)":
-      DatD.value = (DataGm*9.806/ 1000) ;
+      DatD.value = (DataGm * 9.806) / 1000;
       break;
     case "Pasc (N/m^2)":
-      DatD.value = (DataGm*9.806 / 1000) / eval(prompt("area in m"));
+      DatD.value = (DataGm * 9.806) / 1000 / eval(prompt("area in m"));
       break;
   }
   unit.onchange = refD;
@@ -105,7 +117,7 @@ function get() {
   table.appendChild(tr);
   srn++;
 }
-function downloadRaw(){
+function downloadRaw() {
   anchor.setAttribute("download", "Raw.txt");
   anchor.href = "data:text/plain," + encodeURIComponent(DataR.join("\n"));
   anchor.click();
@@ -136,24 +148,33 @@ b[2].onclick = () => {
   canvas2 = document.getElementById("autoScaleGraph");
   context2 = canvas2.getContext("2d");
   document.body.appendChild(x);
+  let pos=0;
   setTimeout(() => {
     grid2();
     timeOut = setInterval(() => {
-      document.getElementById("Data").value=DataGm*9.806 / 1000;
+      document.getElementById("Data").value = (DataGm * 9.806) / 1000;
       recieveD();
       draw2(temp);
       temp.forEach((a) => {
-          pointSet.push([temp.indexOf(a)*period  + (count - 3) * temp.length*period, (a*9.806/ 1000) / scaleFactor]);
+        pointSet.push([
+          temp.indexOf(a) * period + count *temp.length * period,
+          (Math.abs(a) * 9.806) / 1000 * scaleFactor,
+        ]);
       });
+      console.log(pointSet);
     }, 1000);
   }, 1000);
   b[3].disabled = false;
 };
 b[3].onclick = () => {
   clearInterval(timeOut);
-  canvas.style.display="block";
-  canvas2.style.display="none";
-  if(confirm("download?\n would you like to anotate points ? \n\t dont forget to perform proper scaling before download \n\t you can always redraw all using 'draw()' without parameters with proper scaleFactor")){
+  canvas.style.display = "block";
+  canvas2.style.display = "none";
+  if (
+    confirm(
+      "download?(ok)\n would you like to anotate points ? \n\t dont forget to perform proper scaling before download \n\t you can always redraw all using 'draw()' without parameters with proper scaleFactor"
+    )
+  ) {
     draw();
     grid("green");
     anchor.href = canvas.toDataURL("image/png");
@@ -163,18 +184,27 @@ b[3].onclick = () => {
   }
   draw();
   grid("green");
-  document.querySelector(".selection").style.opacity="0.2";
-  setTimeout(()=>{
-    let newScale=eval(prompt(`change scale? current for y-axis 1 gm = ${scaleFactor}`));
-  if(newScale!=null){
-    for(let x=0;x<pointSet.length;x++){
-      pointSet[x][1]=pointSet[x][1]*scaleFactor/newScale;
-    }
-    scaleFactor=newScale; 
-  }
-  draw();
-  grid("green");
-  },2500);
+  document.querySelector(".selection").style.opacity = "0.2";
+  setTimeout(() => {
+    const scaleF=setInterval(()=> {
+      let newScale = eval(
+        prompt(`change scale? current for y-axis 1 gm = ${scaleFactor} \n cancel to abort`)
+      );
+      if (newScale != null) {
+        for (let x = 0; x < pointSet.length; x++) {
+          pointSet[x][1] = (pointSet[x][1] / scaleFactor) * newScale;
+        }
+        scaleFactor = newScale;
+        draw();
+        grid("green");
+      }
+      else{
+        draw();
+        grid("green");
+       clearInterval(scaleF);
+      }
+    },3000);
+    }, 2500);
 };
 b[4].onclick = () => {
   clearInterval(timeOut);
@@ -196,8 +226,9 @@ b[4].onclick = () => {
     eval(document.getElementById("js").value);
   };
 };
-b[5].onclick=()=>{
-  let calWeight=parseInt(eval(prompt("calibration Weight in Gm multiple of 10")));
+b[5].onclick = () => {
+  let calWeight = parseInt(
+    eval(prompt("calibration Weight in Gm multiple of 10"))
+  );
   //send for calibration
-}
-  
+};
