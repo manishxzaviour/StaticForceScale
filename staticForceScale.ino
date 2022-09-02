@@ -9,8 +9,8 @@ IPAddress staticIP(192, 168, 0, 156);
 IPAddress subnet(255, 255, 0, 0);
 IPAddress gateway(192, 168, 0, 3);
 IPAddress primaryDNS(8, 8, 8, 8);
-String ssid=" ";
-String password=" ";
+String ssid = " ";
+String password = " ";
 const char *ssid_ap = "Static_Scale";
 const int LOADCELL_DOUT_PIN = 14;
 const int LOADCELL_SCK_PIN = 12;
@@ -44,13 +44,14 @@ void wifiAp()
     if (count > 5)
       break;
   }
-  if(WiFi.status() != WL_CONNECTED){
-  WiFi.mode(WIFI_AP);
-  WiFi.softAPConfig(staticIP, gateway, subnet);
-  WiFi.softAP(ssid_ap);
-  Serial.println("AP_mode:");
-  Serial.println(WiFi.softAPIP());
-  Blink();
+  if (WiFi.status() != WL_CONNECTED)
+  {
+    WiFi.mode(WIFI_AP);
+    WiFi.softAPConfig(staticIP, gateway, subnet);
+    WiFi.softAP(ssid_ap);
+    Serial.println("AP_mode:");
+    Serial.println(WiFi.softAPIP());
+    Blink();
   }
   Serial.println(WiFi.localIP());
   Blink();
@@ -117,11 +118,11 @@ void rFile(char *f, int a)
       break;
       file.close();
     }
-    }
-    else
-    {
-      server.send(404, "text/html", "Error: File does not exist");
-    }
+  }
+  else
+  {
+    server.send(404, "text/html", "Error: File does not exist");
+  }
 }
 void Index()
 {
@@ -137,34 +138,50 @@ void style()
 }
 void IndexJs()
 {
-  rFile("/index.js" , 2);
+  rFile("/index.js", 2);
 }
 void PlotJs()
 {
-  rFile("/plot.js" , 2);
+  rFile("/plot.js", 2);
 }
-void handleGet() {
+void handleGet()
+{
   String temp;
-  for(int i=0;i<20;i++)
-  temp+=String(data[i])+",";
-  server.send(200,"text/plain",temp);
+  for (int i = 0; i < 20; i++)
+    temp += String(data[i]) + ",";
+  server.send(200, "text/plain", temp);
 }
-void zero(){
+void zero()
+{
   scale.tare();
   Serial.println("zero");
-  server.send(200,"text/plain"," ");
+  server.send(200, "text/plain", " ");
 }
-void calib(){
-  calib1=0;
+void calib()
+{
+  calib1 = 0;
   scale.set_scale();
-  for(int i=0;i<3;i++){
-  calib1+=scale.get_units(80);
-  delay(1000);
+  for (int i = 0; i < 3; i++)
+  {
+    calib1 += scale.get_units(80);
+    delay(1000);
   }
-  calib1/=3;
-  calib2=String(server.arg("plain")).toInt();
-  scale.set_scale(calib1/calib2);
-  server.send(200,"text/plain"," ");
+  calib1 /= 3;
+  calib2 = String(server.arg("plain")).toInt();
+  scale.set_scale(calib1 / calib2);
+  server.send(200, "text/plain", String(calib1));
+}
+void gainA()
+{
+  scale.set_gain(128);
+}
+void gainB()
+{
+  scale.set_gain(64);
+}
+void gainC()
+{
+  scale.set_gain(32);
 }
 void handleRequest()
 {
@@ -175,8 +192,11 @@ void handleRequest()
   server.on("/index.js", IndexJs);
   server.on("/plot.js", PlotJs);
   server.on("/get", handleGet);
-  server.on("/zero",zero);
-  server.on("/calib",calib);
+  server.on("/zero", zero);
+  server.on("/calib", calib);
+  server.on("/gA", gainA);
+  server.on("/gB", gainB);
+  server.on("/gC", gainC);
   server.onNotFound(hNF);
 }
 void setup()
@@ -204,15 +224,16 @@ void setup()
   wifiAp();
   ota();
   MDNS.begin("Scale");
-	MDNS.addService("http","tcp", 80);
+  MDNS.addService("http", "tcp", 80);
   handleRequest();
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
   scale.tare();
+  scale.set_gain(128);
   scale.set_scale(calib1 / calib2);
-  }
+}
 void loop()
 {
-  analogWrite(led,200);
+  analogWrite(led, 200);
   if (scale.is_ready())
   {
     long reading = scale.read();
@@ -235,5 +256,5 @@ void loop()
   server.handleClient();
   MDNS.update();
   ArduinoOTA.handle();
-  String temp="";
+  String temp = "";
 }

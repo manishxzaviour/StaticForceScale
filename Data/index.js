@@ -51,7 +51,7 @@ let temp = [];
 let timeOut;
 let period = 10;
 let err = 0.0;
-let toggle=true;
+let toggle = true;
 var anchor = document.createElement("a");
 let b = selection.map((a) => {
   return document.getElementById(a);
@@ -83,7 +83,7 @@ function recieveD() {
   } else {
     DataGm = Math.max.apply(null, temp);
   }
-  samples.innerHTML = `sampleSet : ${count} mode: ${state}`;
+  samples.innerHTML = `| sampleSet : ${count} | mode: ${state}`;
   count++;
 }
 function GetD() {
@@ -122,6 +122,26 @@ function downloadRaw() {
   anchor.href = "data:text/plain," + encodeURIComponent(DataR.join("\n"));
   anchor.click();
 }
+let gain = document.getElementById("gain");
+gain.onchange = () => {
+  let gainSend = new XMLHttpRequest();
+  gainSend.onreadystatechange=function (){if(this.readyState==4&&this.state==200) console.log(`gain ${gain.value}`)}
+  switch (gain.value) {
+    case '64':
+      gainSend.open("POST", "/gB");
+      gainSend.send();
+      break;
+    case '128':
+      gainSend.open("POST", "/gA");
+      gainSend.send();
+      break;
+    case '32':
+      gainSend.open("POST", "/gC");
+      gainSend.send();
+      break;
+  }
+  b[5].click();
+};
 b[0].onmouseover = () => {
   b[0].setAttribute("title", `error: ${err}`);
 };
@@ -174,11 +194,10 @@ b[3].onclick = () => {
   clearInterval(timeOut);
   canvas.style.display = "block";
   canvas2.style.display = "none";
-  if(toggle)
-  {
-  draw();
-  grid("green");
-  toggle=!toggle;
+  if (toggle) {
+    draw();
+    grid("green");
+    toggle = !toggle;
   }
   if (
     confirm(
@@ -250,22 +269,31 @@ b[5].onclick = () => {
     post.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 200) {
         alert("zeroed");
-      } else console.log("not zeroed", this.status);
+      }
     };
     post.open("GET", "/zero", true);
     post.send();
   } else {
-    let calib = parseInt(eval(prompt("enter mass used in gm")));
+    let calib = parseInt(
+      eval(prompt("enter mass used in gm (5rs(2011) =6gm)"))
+    );
     post.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 200) {
         alert("calibrated");
+        console.log("calib1 :",this.responseText);
         setTimeout(() => {
           GetD();
           err = (calib - document.getElementById("Data").value) / calib;
           err = err * 100;
-          err=err.toFixed(2);
+          err = err.toFixed(2);
         }, 2000);
-      } else console.log("not calibrated", this.status);
+        setTimeout(() => {
+          GetD();
+          err = (calib - document.getElementById("Data").value) / calib;
+          err = err * 100;
+          err = err.toFixed(2);
+        }, 1000);
+      }
     };
     post.open("POST", "/calib", true);
     post.send(calib);
