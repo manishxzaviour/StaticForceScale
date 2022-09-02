@@ -54,7 +54,7 @@ function draw() {
   grid();
   DataR.forEach((e)=>{
     drawLine(
-          [pos*period,(e*9.81/1000)*scaleFactor],
+          [pos*period,(e*9.81/1000)*scaleFactor+10],
           [(pos+1)*period,(DataR[pos + 1]*9.81/1000)*scaleFactor],
           colourScale,
           1,
@@ -71,6 +71,7 @@ function grid(c = "rgba(0, 0, 0, 0.3)") {
     context.beginPath();
     context.font = "10px Arial";
     if (i % (20*period) == 0){
+      context.fillStyle="black"
       context.fillText(`${pos} s`, i, canvas.height);
     pos++;
     } 

@@ -212,7 +212,7 @@ void setup()
   }
 void loop()
 {
-  digitalWrite(led,HIGH);
+  analogWrite(led,200);
   if (scale.is_ready())
   {
     long reading = scale.read();
