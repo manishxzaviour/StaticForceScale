@@ -55,7 +55,7 @@ function draw() {
   DataR.forEach((e)=>{
     drawLine(
           [pos*period,(e*9.81/1000)*scaleFactor+10],
-          [(pos+1)*period,(DataR[pos + 1]*9.81/1000)*scaleFactor],
+          [(pos+1)*period,(DataR[pos + 1]*9.81/1000)*scaleFactor+10],
           colourScale,
           1,
           canvas,
