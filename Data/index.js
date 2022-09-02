@@ -49,7 +49,7 @@ let count = 1;
 let DataR = [];
 let temp = [];
 let timeOut;
-let period = 50;
+let period = 5;
 var anchor = document.createElement("a");
 let b = selection.map((a) => {
   return document.getElementById(a);
@@ -66,9 +66,7 @@ function recieveD() {
         temp[i] = parseInt(str.substring(0, str.indexOf(",")));
         str = str.substring(str.indexOf(",") + 1, str.length);
       }
-      console.log(temp);
-    } else {
-      console.log(this.status);
+      // console.log(temp);
     }
   };
   xhttp.open("GET", "/get", true);
@@ -148,20 +146,18 @@ b[2].onclick = () => {
   canvas2 = document.getElementById("autoScaleGraph");
   context2 = canvas2.getContext("2d");
   document.body.appendChild(x);
-  let pos=0;
   setTimeout(() => {
     grid2();
     timeOut = setInterval(() => {
       document.getElementById("Data").value = (DataGm * 9.806) / 1000;
       recieveD();
       draw2(temp);
-      temp.forEach((a) => {
-        pointSet.push([
-          temp.indexOf(a) * period + count *temp.length * period,
-          (Math.abs(a) * 9.806) / 1000 * scaleFactor,
-        ]);
-      });
-      console.log(pointSet);
+      // temp.forEach((a) => {
+      //   pointSet.push([
+      //     temp.indexOf(a) * period + count *temp.length * period,
+      //     (Math.abs(a) * 9.806) / 1000 * scaleFactor,
+      //   ]);
+      // });
     }, 1000);
   }, 1000);
   b[3].disabled = false;
@@ -188,20 +184,25 @@ b[3].onclick = () => {
   setTimeout(() => {
     const scaleF=setInterval(()=> {
       let newScale = eval(
-        prompt(`change scale? current for y-axis 1 gm = ${scaleFactor} \n cancel to abort`)
+        prompt(`change scale? current for y-axis = ${scaleFactor} \n cancel to abort`)
+      );
+      let newPeriod=eval(
+        prompt(`change period? current for x-axis = ${period} \n cancel to abort`)
       );
       if (newScale != null) {
-        for (let x = 0; x < pointSet.length; x++) {
-          pointSet[x][1] = (pointSet[x][1] / scaleFactor) * newScale;
-        }
         scaleFactor = newScale;
         draw();
         grid("green");
       }
-      else{
+      if(newPeriod!=null){
+        period=newPeriod;
         draw();
         grid("green");
-       clearInterval(scaleF);
+      }
+      if(newScale == null && newPeriod==null){
+        draw();
+        grid("green");
+        clearInterval(scaleF);
       }
     },3000);
     }, 2500);
@@ -227,8 +228,27 @@ b[4].onclick = () => {
   };
 };
 b[5].onclick = () => {
-  let calWeight = parseInt(
-    eval(prompt("calibration Weight in Gm multiple of 10"))
-  );
-  //send for calibration
+  let opt=confirm("would you like to ? \n\t zero(ok) or \n\t calibrate(cancel)");
+  let post=new XMLHttpRequest();
+  if(opt){
+    post.onreadystatechange = function (){
+      if (this.readyState == 4 && this.status == 200) {
+        alert("zeroed");
+      }
+      else console.log("not zeroed",this.status);
+    }
+    post.open("GET","/zero",true);
+    post.send();
+  }
+  else{
+    let calib=parseInt(eval(prompt("enter mass used in gm")));
+    post.onreadystatechange = function (){
+      if (this.readyState == 4 && this.status == 200) {
+        alert("calibrated");
+      }
+      else console.log("not calibrated",this.status);
+    }
+    post.open("POST","/calib",true);
+    post.send(calib);
+  }
 };

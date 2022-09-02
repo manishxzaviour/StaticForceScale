@@ -149,6 +149,23 @@ void handleGet() {
   temp+=String(data[i])+",";
   server.send(200,"text/plain",temp);
 }
+void zero(){
+  scale.tare();
+  Serial.println("zero");
+  server.send(200,"text/plain"," ");
+}
+void calib(){
+  calib1=0;
+  scale.set_scale();
+  for(int i=0;i<3;i++){
+  calib1+=scale.get_units(80);
+  delay(1000);
+  }
+  calib1/=3;
+  calib2=String(server.arg("plain")).toInt();
+  scale.set_scale(calib1/calib2);
+  server.send(200,"text/plain"," ");
+}
 void handleRequest()
 {
   server.begin();
@@ -158,6 +175,8 @@ void handleRequest()
   server.on("/index.js", IndexJs);
   server.on("/plot.js", PlotJs);
   server.on("/get", handleGet);
+  server.on("/zero",zero);
+  server.on("/calib",calib);
   server.onNotFound(hNF);
 }
 void setup()
@@ -201,11 +220,11 @@ void loop()
     count++;
     if (count == 20)
       count = 0;
-    Serial.print("reading: ");
-    Serial.print(reading);
-    Serial.print(", unit: ");
-    Serial.print(val);
-    Serial.println(" ");
+    // Serial.print("reading: ");
+    // Serial.print(reading);
+    // Serial.print(", unit: ");
+    // Serial.print(val);
+    // Serial.println(" ");
   }
   else
   {

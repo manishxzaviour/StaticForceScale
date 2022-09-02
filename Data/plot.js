@@ -37,38 +37,44 @@ canvas.onmousedown = (e) => {
   context.arc(x, y, 4, 0, 2 * Math.PI);
   context.font = "17px Arial";
   context.fillText(
-    `T : ${x / 20}S F : ${(canvas.height - y) / scaleFactor}N`,
+    `T : ${x / (20*period)} S F : ${(canvas.height - y) / scaleFactor} N`,
     x,
     y
   );
   context.stroke();
 };
-function draw(t = canvas.width, n = canvas.height) {
-  canvas.setAttribute("width", `${pointSet[pointSet.length - 1][0] + 300}px`);
+function draw() {
+  let pos=0;
+  if(DataR.length*period>canvas.width)
+  canvas.setAttribute("width", `${DataR.length*period + 300}px`);
   canvas.setAttribute("height", `750px`);
   context.clearRect(0,0,canvas.width,canvas.height)
   grid();
-  DataR.forEach((e) => { // do using data r
-     if (e[1]*scaleFactor > canvas.height) canvas.setAttribute("height", `${e[1]*scaleFactor * 1.1}px`);
+  DataR.forEach((e)=>{
     drawLine(
-      e,
-      pointSet[pointSet.indexOf(e) + 1],
-      colourScale,
-      1,
-      canvas,
-      context
-    );
+          [pos*period,(e*9.81/1000)*scaleFactor],
+          [(pos+1)*period,(DataR[pos + 1]*9.81/1000)*scaleFactor],
+          colourScale,
+          1,
+          canvas,
+          context
+        );
+        pos++;
   });
 }
 function grid(c = "rgba(0, 0, 0, 0.3)") {
-  for (let i = 0; i < canvas.width; i += 25) {
+  let pos=0;
+  for (let i = 0; i < canvas.width; i += 20) {
     drawLine([i, 0], [i, canvas.height], c, 0.3, canvas, context);
     context.beginPath();
     context.font = "10px Arial";
-    if (i % (20*period) == 0) context.fillText(`${i / (20*period) /5} s`, i, canvas.height);
+    if (i % (20*period) == 0){
+      context.fillText(`${pos} s`, i, canvas.height);
+    pos++;
+    } 
     context.stroke();
   }
-  for (let j = 0; j < canvas.height; j += 25) {
+  for (let j = 0; j < canvas.height; j += 20) {
     drawLine([0, j], [canvas.width, j], c, 0.3, canvas, context);
   }
   drawLine([0, 10], [canvas.width, 10], "rgb(3, 126, 160)", 2, canvas, context);
