@@ -25,7 +25,7 @@ let pointSet = [[0, 0]];
 let set=[];
 for(let x=0;x<160;x++){set[[x]]=0;}
 let flag=true;
-let scaleFactor = 2;
+let scaleFactor = 10;
 let countx=0;
 canvas.onmousedown = (e) => {
   var rect = e.target.getBoundingClientRect();
@@ -36,8 +36,9 @@ canvas.onmousedown = (e) => {
   context.lineWidth = 1;
   context.arc(x, y, 4, 0, 2 * Math.PI);
   context.font = "17px Arial";
+  context.fillStyle="black";
   context.fillText(
-    `T : ${x / (20*period)} S F : ${(canvas.height - y) / scaleFactor} N`,
+    `T: ${(x / (20*period)).toFixed(3)}S , F: ${((canvas.height - y) / scaleFactor).toFixed(4)}N`,
     x,
     y
   );
@@ -48,7 +49,8 @@ function draw() {
   if(DataR.length*period>canvas.width)
   canvas.setAttribute("width", `${DataR.length*period + 300}px`);
   canvas.setAttribute("height", `750px`);
-  context.clearRect(0,0,canvas.width,canvas.height)
+  context.fillStyle="white";
+  context.fillRect(0, 0, canvas.width, canvas.height);
   grid();
   DataR.forEach((e)=>{
     drawLine(

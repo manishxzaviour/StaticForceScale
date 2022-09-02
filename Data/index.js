@@ -49,7 +49,9 @@ let count = 1;
 let DataR = [];
 let temp = [];
 let timeOut;
-let period = 5;
+let period = 10;
+let err = 0.0;
+let toggle=true;
 var anchor = document.createElement("a");
 let b = selection.map((a) => {
   return document.getElementById(a);
@@ -120,6 +122,12 @@ function downloadRaw() {
   anchor.href = "data:text/plain," + encodeURIComponent(DataR.join("\n"));
   anchor.click();
 }
+b[0].onmouseover = () => {
+  b[0].setAttribute("title", `error: ${err}`);
+};
+b[1].onmouseover = () => {
+  b[1].setAttribute("title", `error: ${err}`);
+};
 b[0].onclick = () => {
   clearInterval(timeOut);
   srn = 1;
@@ -166,46 +174,52 @@ b[3].onclick = () => {
   clearInterval(timeOut);
   canvas.style.display = "block";
   canvas2.style.display = "none";
+  if(toggle)
+  {
+  draw();
+  grid("green");
+  toggle=!toggle;
+  }
   if (
     confirm(
       "download?(ok)\n would you like to anotate points ? \n\t dont forget to perform proper scaling before download \n\t you can always redraw all using 'draw()' without parameters with proper scaleFactor"
     )
   ) {
-    draw();
-    grid("green");
     anchor.href = canvas.toDataURL("image/png");
     anchor.download = "plot.PNG";
     anchor.click();
     downloadRaw();
   }
-  draw();
-  grid("green");
   document.querySelector(".selection").style.opacity = "0.2";
   setTimeout(() => {
-    const scaleF=setInterval(()=> {
+    const scaleF = setInterval(() => {
       let newScale = eval(
-        prompt(`change scale? current for y-axis = ${scaleFactor} \n cancel to abort`)
+        prompt(
+          `change scale? current for y-axis = ${scaleFactor} \n cancel to abort`
+        )
       );
-      let newPeriod=eval(
-        prompt(`change period? current for x-axis = ${period} \n cancel to abort`)
+      let newPeriod = eval(
+        prompt(
+          `change period? current for x-axis = ${period} \n cancel to abort`
+        )
       );
       if (newScale != null) {
         scaleFactor = newScale;
         draw();
         grid("green");
       }
-      if(newPeriod!=null){
-        period=newPeriod;
+      if (newPeriod != null) {
+        period = newPeriod;
         draw();
         grid("green");
       }
-      if(newScale == null && newPeriod==null){
+      if (newScale == null && newPeriod == null) {
         draw();
         grid("green");
         clearInterval(scaleF);
       }
-    },3000);
-    }, 2500);
+    }, 3000);
+  }, 2500);
 };
 b[4].onclick = () => {
   clearInterval(timeOut);
@@ -228,27 +242,32 @@ b[4].onclick = () => {
   };
 };
 b[5].onclick = () => {
-  let opt=confirm("would you like to ? \n\t zero(ok) or \n\t calibrate(cancel)");
-  let post=new XMLHttpRequest();
-  if(opt){
-    post.onreadystatechange = function (){
+  let opt = confirm(
+    "would you like to ? \n\t zero(ok) or \n\t calibrate(cancel)"
+  );
+  let post = new XMLHttpRequest();
+  if (opt) {
+    post.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 200) {
         alert("zeroed");
-      }
-      else console.log("not zeroed",this.status);
-    }
-    post.open("GET","/zero",true);
+      } else console.log("not zeroed", this.status);
+    };
+    post.open("GET", "/zero", true);
     post.send();
-  }
-  else{
-    let calib=parseInt(eval(prompt("enter mass used in gm")));
-    post.onreadystatechange = function (){
+  } else {
+    let calib = parseInt(eval(prompt("enter mass used in gm")));
+    post.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 200) {
         alert("calibrated");
-      }
-      else console.log("not calibrated",this.status);
-    }
-    post.open("POST","/calib",true);
+        setTimeout(() => {
+          GetD();
+          err = (calib - document.getElementById("Data").value) / calib;
+          err = err * 100;
+          err=err.toFixed(2);
+        }, 2000);
+      } else console.log("not calibrated", this.status);
+    };
+    post.open("POST", "/calib", true);
     post.send(calib);
   }
 };
