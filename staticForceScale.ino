@@ -220,11 +220,11 @@ void loop()
     count++;
     if (count == 20)
       count = 0;
-    // Serial.print("reading: ");
-    // Serial.print(reading);
-    // Serial.print(", unit: ");
-    // Serial.print(val);
-    // Serial.println(" ");
+    Serial.print("reading: ");
+    Serial.print(reading);
+    Serial.print(", unit: ");
+    Serial.print(val);
+    Serial.println(" ");
   }
   else
   {
